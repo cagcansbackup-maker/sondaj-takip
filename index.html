@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sondaj Takip Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #0052a3;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-light: #f5f7fa;
+            --gray-border: #d1d5db;
+            --gray-text: #6b7280;
+            --text-dark: #1f2937;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            color: var(--text-dark);
+            padding: 24px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 32px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        
+        .header-text p {
+            font-size: 14px;
+            color: var(--gray-text);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: var(--gray-light);
+            border-color: var(--text-dark);
+        }
+        
+        .btn-add {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .btn-add:hover {
+            background: rgba(0, 102, 204, 0.05);
+        }
+        
+        .table-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 16px 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .table-info {
+            font-size: 13px;
+            color: var(--gray-text);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        thead {
+            background: #f3f4f6;
+            border-bottom: 2px solid var(--gray-border);
+        }
+        
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text-dark);
+        }
+        
+        tbody tr {
+            transition: background-color 0.15s;
+        }
+        
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #fcfcfd;
+        }
+        
+        .cell-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .cell-number {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .cell-date {
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 18px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            min-width: 80px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 45px;
+            text-align: right;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .status-ongoing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        
+        .status-paused {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            color: var(--text-dark);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-small:hover {
+            background: var(--gray-light);
+            border-color: var(--text-dark);
+        }
+        
+        .btn-small.danger:hover {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--gray-text);
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 650px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-border);
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-text);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            color: var(--text-dark);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-grid.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: flex-end;
+        }
+        
+        .btn-primary {
+            padding: 10px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            padding: 10px 24px;
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--gray-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-light);
+            border-color: var(--text-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 10px 12px;
+            }
+            
+            .modal-content {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>Sondaj Takip Sistemi</h1>
+                <p>MTA Jeoteknik Sondaj Projesi - Gerçek Zamanlı İlerleme Takibi</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="openDataModal()" title="Veri Yönetimi">⚙️</button>
+                <button class="btn-icon btn-add" onclick="openAddModal()" title="Yeni Sondaj Ekle">+</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-wrapper">
+        <div class="table-header">
+            <h2>Sondaj Listesi</h2>
+            <span class="table-info" id="drillCount">0 sondaj kaydı</span>
+        </div>
+        
+        <div id="drillingListContainer">
+            <div class="empty-state">
+                <p>📋 Henüz sondaj kaydı yok</p>
+                <p>Başlık kısmındaki + işareti ile yeni sondaj ekleyin</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Form -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Yeni Sondaj Ekle</h2>
+            <button class="close-btn" onclick="closeAddModal()">×</button>
+        </div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="drillingName">Sondaj Adı *</label>
+                <input type="text" id="drillingName" placeholder="S-01, KJS-03 vb.">
+            </div>
+            <div class="form-group">
+                <label for="startDate">Başlama Tarihi *</label>
+                <input type="date" id="startDate">
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="endDate">Bitiş Tarihi</label>
+                <input type="date" id="endDate">
+            </div>
+            <div class="form-group">
+                <label for="totalDepth">Toplam Derinlik (m) *</label>
+                <input type="number" id="totalDepth" placeholder="100, 250 vb." step="0.1">
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="currentDepth">Mevcut Derinlik (m)</label>
+                <input type="number" id="currentDepth" placeholder="0" step="0.1" value="0">
+            </div>
+            <div class="form-group">
+                <label for="status">Durum</label>
+                <select id="status">
+                    <option value="ongoing">Devam Ediyor</option>
+                    <option value="completed">Tamamlandı</option>
+                    <option value="paused">Duraklatıldı</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeAddModal()">İptal</button>
+            <button class="btn-primary" onclick="addDrilling()">Ekle</button>
+        </div>
+    </div>
+</div>
+
+<!-- Veri Yönetimi Modal -->
+<div id="dataModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h2>Veri Yönetimi</h2>
+            <button class="close-btn" onclick="closeDataModal()">×</button>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="exportToJSON()">📥 Verileri İndir (JSON)</button>
+            <button class="btn-secondary" style="width: 100%; padding: 12px; border: 1px solid var(--gray-border);" onclick="importJSON()">📤 Verileri Yükle (JSON)</button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="jsonFile" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+
+<script>
+    let drillings = JSON.parse(localStorage.getItem('drillings')) || [];
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString + 'T00:00:00');
+        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+    
+    function getStatusText(status) {
+        const statusMap = {
+            'ongoing': 'Devam Ediyor',
+            'completed': 'Tamamlandı',
+            'paused': 'Duraklatıldı'
+        };
+        return statusMap[status] || status;
+    }
+    
+    function getStatusClass(status) {
+        return 'status-' + status;
+    }
+    
+    function addDrilling() {
+        const name = document.getElementById('drillingName').value.trim();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const totalDepth = parseFloat(document.getElementById('totalDepth').value);
+        const currentDepth = parseFloat(document.getElementById('currentDepth').value) || 0;
+        const status = document.getElementById('status').value;
+        
+        if (!name || !startDate || !totalDepth || totalDepth <= 0) {
+            alert('Lütfen zorunlu alanları doldurun:\n- Sondaj Adı\n- Başlama Tarihi\n- Toplam Derinlik');
+            return;
+        }
+        
+        if (currentDepth < 0 || currentDepth > totalDepth) {
+            alert('Mevcut derinlik 0 ile toplam derinlik arasında olmalıdır');
+            return;
+        }
+        
+        const newDrilling = {
+            id: Date.now(),
+            name,
+            startDate,
+            endDate: endDate || null,
+            totalDepth,
+            currentDepth,
+            status,
+            createdAt: new Date().toISOString()
+        };
+        
+        drillings.push(newDrilling);
+        saveDrillings();
+        renderDrillings();
+        closeAddModal();
+    }
+    
+    function deleteDrilling(id) {
+        if (confirm('Bu sondajı silmek istediğinize emin misiniz?')) {
+            drillings = drillings.filter(d => d.id !== id);
+            saveDrillings();
+            renderDrillings();
+        }
+    }
+    
+    function updateDrilling(id) {
+        const drilling = drillings.find(d => d.id === id);
+        if (!drilling) return;
+        
+        const newDepth = prompt(`${drilling.name} için yeni derinlik (m):`, drilling.currentDepth);
+        if (newDepth !== null) {
+            const depth = parseFloat(newDepth);
+            if (!isNaN(depth) && depth >= 0 && depth <= drilling.totalDepth) {
+                drilling.currentDepth = depth;
+                if (depth === drilling.totalDepth && drilling.status === 'ongoing') {
+                    drilling.status = 'completed';
+                    drilling.endDate = new Date().toISOString().split('T')[0];
+                }
+                saveDrillings();
+                renderDrillings();
+            } else {
+                alert('Geçerli bir derinlik giriniz (0 - ' + drilling.totalDepth + ')');
+            }
+        }
+    }
+    
+    function saveDrillings() {
+        localStorage.setItem('drillings', JSON.stringify(drillings));
+    }
+    
+    function clearForm() {
+        document.getElementById('drillingName').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('totalDepth').value = '';
+        document.getElementById('currentDepth').value = '0';
+        document.getElementById('status').value = 'ongoing';
+    }
+    
+    function openAddModal() {
+        clearForm();
+        document.getElementById('addModal').classList.add('active');
+    }
+    
+    function closeAddModal() {
+        document.getElementById('addModal').classList.remove('active');
+        clearForm();
+    }
+    
+    function openDataModal() {
+        document.getElementById('dataModal').classList.add('active');
+    }
+    
+    function closeDataModal() {
+        document.getElementById('dataModal').classList.remove('active');
+    }
+    
+    document.getElementById('addModal').addEventListener('click', function(e) {
+        if (e.target === this) closeAddModal();
+    });
+    
+    document.getElementById('dataModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDataModal();
+    });
+    
+    function exportToJSON() {
+        const dataStr = JSON.stringify(drillings, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sondajlar_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    function importJSON() {
+        document.getElementById('jsonFile').click();
+    }
+    
+    function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    drillings = imported;
+                    saveDrillings();
+                    renderDrillings();
+                    closeDataModal();
+                    alert('Veriler başarıyla içe aktarıldı!');
+                } else {
+                    alert('Geçersiz JSON formatı.');
+                }
+            } catch (error) {
+                alert('Dosya okuma hatası: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+    
+    function renderDrillings() {
+        const container = document.getElementById('drillingListContainer');
+        const countDisplay = document.getElementById('drillCount');
+        
+        if (drillings.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>📋 Henüz sondaj kaydı yok</p><p>Başlık kısmındaki + işareti ile yeni sondaj ekleyin</p></div>';
+            countDisplay.textContent = '0 sondaj kaydı';
+            return;
+        }
+        
+        countDisplay.textContent = drillings.length + ' sondaj kaydı';
+        const sorted = [...drillings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        let tableHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sondaj Adı</th>
+                        <th>Başlama</th>
+                        <th>Bitiş</th>
+                        <th>Derinlik (m)</th>
+                        <th>İlerleme</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        sorted.forEach(drilling => {
+            const percentage = Math.round((drilling.currentDepth / drilling.totalDepth) * 100);
+            const statusClass = getStatusClass(drilling.status);
+            const statusText = getStatusText(drilling.status);
+            
+            tableHTML += `
+                <tr>
+                    <td><span class="cell-name">${drilling.name}</span></td>
+                    <td class="cell-date">${formatDate(drilling.startDate)}</td>
+                    <td class="cell-date">${formatDate(drilling.endDate)}</td>
+                    <td class="cell-number">${drilling.currentDepth} / ${drilling.totalDepth}</td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percentage}%">
+                                    ${percentage > 25 ? percentage + '%' : ''}
+                                </div>
+                            </div>
+                            <span class="progress-text">${percentage}%</span>
+                        </div>
+                    </td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-small" onclick="updateDrilling(${drilling.id})">Güncelle</button>
+                            <button class="btn-small danger" onclick="deleteDrilling(${drilling.id})">Sil</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableHTML += `
+                    </tbody>
+                </table>
+        `;
+        
+        container.innerHTML = tableHTML;
+    }
+    
+    renderDrillings();
+</script>
+</body>
+</html>
